@@ -24,7 +24,7 @@ public class ConfiguracoesSeguranca {
         return httpSecurity
                 .authorizeHttpRequests(
                         req -> {
-                            req.requestMatchers("/login", "/atualizar-token").permitAll();
+                            req.requestMatchers("/login", "/atualizar-token", "/usuarios/**").permitAll();
                             req.anyRequest().authenticated();
                         })
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

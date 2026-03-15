@@ -25,7 +25,7 @@ public class UsuarioController {
     @PostMapping("/registrar")
     public ResponseEntity<DadosListagemUsuario> cadastrar(@RequestBody @Valid DadosCadastroUsuario dadosCadastroUsuario,
                                                           UriComponentsBuilder uriComponentsBuilder) {
-        Usuario usuario = null;
+        Usuario usuario = this.usuarioService.cadastrar(dadosCadastroUsuario);
         URI uri = uriComponentsBuilder.path("/{nomeUsuario}").buildAndExpand(usuario.getNomeUsuario()).toUri();
         return ResponseEntity.created(uri).body(new DadosListagemUsuario(usuario));
     }

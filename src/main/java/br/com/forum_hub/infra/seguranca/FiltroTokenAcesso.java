@@ -34,7 +34,7 @@ public class FiltroTokenAcesso extends OncePerRequestFilter {
             //validacao do token
             String username = this.tokenService.verificarToken(token);
 
-            Usuario usuario = this.usuarioRepository.findByEmailIgnoreCase(username)
+            Usuario usuario = this.usuarioRepository.findByEmailIgnoreCaseAndVerificadoTrue(username)
                     .orElseThrow(() -> new UsernameNotFoundException(String.format(
                             "Usuário de e-mail %s não existe", username)));
 
