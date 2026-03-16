@@ -49,4 +49,11 @@ public class UsuarioController {
         usuarioService.desativarUsuario(logado);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/adicionar-perfil/{id}")
+    public ResponseEntity<DadosListagemUsuario> adicionarPerfil(@PathVariable Long id,
+                                                                @RequestBody @Valid DadosPerfil dados){
+        Usuario usuario = usuarioService.adicionarPerfil(id, dados);
+        return ResponseEntity.ok(new DadosListagemUsuario(usuario));
+    }
 }

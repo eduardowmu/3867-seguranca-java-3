@@ -1,12 +1,16 @@
 package br.com.forum_hub.domain.usuario;
 
+import br.com.forum_hub.domain.perfil.Perfil;
+import br.com.forum_hub.domain.perfil.PerfilEnum;
 import br.com.forum_hub.infra.exception.RegraDeNegocioException;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,14 +29,18 @@ public class Usuario implements UserDetails {
     private Boolean verificado;
     private String token;
     private LocalDateTime expiracaoToken;
-
     private Boolean ativo;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "usuarios_perfis",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "perfil_id"))
+    private List<Perfil> perfis;
 
     @Deprecated
     public Usuario() {
     }
 
-    public Usuario(DadosCadastroUsuario dados, String senhaCriptografada) {
+    public Usuario(DadosCadastroUsuario dados, String senhaCriptografada, Perfil perfil) {
         this.nomeCompleto = dados.nomeCompleto();
         this.email = dados.email();
         this.senha = senhaCriptografada;
@@ -43,10 +51,12 @@ public class Usuario implements UserDetails {
         this.token = UUID.randomUUID().toString();
         this.expiracaoToken = LocalDateTime.now().plusMinutes(30);
         this.ativo = false;
+        this.perfis = new ArrayList<>();
+        this.perfis.add(perfil);
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return perfis;
     }
 
     @Override
@@ -144,6 +154,14 @@ public class Usuario implements UserDetails {
         this.expiracaoToken = expiracaoToken;
     }
 
+    public List<Perfil> getPerfis() {
+        return perfis;
+    }
+
+    public void setPerfis(List<Perfil> perfis) {
+        this.perfis = perfis;
+    }
+
     public void verificar() {
         if(this.expiracaoToken.isBefore(LocalDateTime.now())) {
             throw new RegraDeNegocioException("Link de verificação expirou!");
@@ -151,6 +169,7 @@ public class Usuario implements UserDetails {
         this.verificado = true;
         this.token = null;
         this.expiracaoToken = null;
+        this.ativo = true;
     }
 
     public void desativar() {
@@ -172,5 +191,12 @@ public class Usuario implements UserDetails {
 
     public void alterarSenha(String senhaCriptografada) {
         this.senha = senhaCriptografada;
+    }
+
+    public void adicionarPerfil(Perfil perfil) {
+        if(this.perfis == null) {
+            this.perfis = new ArrayList<>();
+        }
+        this.perfis.add(perfil);
     }
 }
