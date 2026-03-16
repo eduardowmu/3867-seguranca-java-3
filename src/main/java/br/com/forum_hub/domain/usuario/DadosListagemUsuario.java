@@ -1,7 +1,7 @@
 package br.com.forum_hub.domain.usuario;
 
 public record DadosListagemUsuario(
-        Long id,
+       Long id,
        String email,
        String nomeCompleto,
        String nomeUsuario,

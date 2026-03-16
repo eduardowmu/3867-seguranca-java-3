@@ -1,5 +1,6 @@
 package br.com.forum_hub.domain.usuario;
 
+import br.com.forum_hub.infra.exception.RegraDeNegocioException;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,9 @@ public class Usuario implements UserDetails {
     private String token;
     private LocalDateTime expiracaoToken;
 
+    private Boolean ativo;
+
+    @Deprecated
     public Usuario() {
     }
 
@@ -38,8 +42,8 @@ public class Usuario implements UserDetails {
         this.verificado = false;
         this.token = UUID.randomUUID().toString();
         this.expiracaoToken = LocalDateTime.now().plusMinutes(30);
+        this.ativo = false;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -53,6 +57,11 @@ public class Usuario implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return ativo;
     }
 
     public String getNomeCompleto() {
@@ -109,5 +118,59 @@ public class Usuario implements UserDetails {
 
     public void setMiniBiografia(String miniBiografia) {
         this.miniBiografia = miniBiografia;
+    }
+
+    public Boolean getVerificado() {
+        return verificado;
+    }
+
+    public void setVerificado(Boolean verificado) {
+        this.verificado = verificado;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public LocalDateTime getExpiracaoToken() {
+        return expiracaoToken;
+    }
+
+    public void setExpiracaoToken(LocalDateTime expiracaoToken) {
+        this.expiracaoToken = expiracaoToken;
+    }
+
+    public void verificar() {
+        if(this.expiracaoToken.isBefore(LocalDateTime.now())) {
+            throw new RegraDeNegocioException("Link de verificação expirou!");
+        }
+        this.verificado = true;
+        this.token = null;
+        this.expiracaoToken = null;
+    }
+
+    public void desativar() {
+        this.ativo = false;
+    }
+
+    public Usuario alterarDados(DadosEdicaoUsuario dados) {
+        if(dados.nomeUsuario() != null){
+            this.nomeUsuario = dados.nomeUsuario();
+        }
+        if(dados.miniBiografia() != null){
+            this.miniBiografia = dados.miniBiografia();
+        }
+        if(dados.biografia() != null){
+            this.biografia = dados.biografia();
+        }
+        return this;
+    }
+
+    public void alterarSenha(String senhaCriptografada) {
+        this.senha = senhaCriptografada;
     }
 }
