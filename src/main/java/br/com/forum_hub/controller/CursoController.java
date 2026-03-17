@@ -28,5 +28,4 @@ public class CursoController {
         var pagina = service.listar(categoria, paginacao);
         return ResponseEntity.ok(pagina);
     }
-
 }

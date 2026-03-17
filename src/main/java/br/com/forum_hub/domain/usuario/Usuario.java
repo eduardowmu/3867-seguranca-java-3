@@ -199,4 +199,8 @@ public class Usuario implements UserDetails {
         }
         this.perfis.add(perfil);
     }
+
+    public void removerPerfil(Perfil perfil) {
+        this.perfis.remove(perfil);
+    }
 }
